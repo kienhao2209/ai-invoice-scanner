@@ -2,6 +2,7 @@ import "./App.css";
 import { withAuthenticator } from "@aws-amplify/ui-react";
 import "@aws-amplify/ui-react/styles.css";
 import UploadForm from "./components/UploadForm";
+import InvoiceLookup from "./components/InvoiceLookup";
 
 function App({ signOut, user }) {
     return (
@@ -12,6 +13,9 @@ function App({ signOut, user }) {
 
             {/* Component Upload */}
             <UploadForm />
+
+            {/* Component Tra cứu */}
+            <InvoiceLookup />
         </div>
     );
 }

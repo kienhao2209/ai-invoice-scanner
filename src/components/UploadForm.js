@@ -5,7 +5,7 @@ function UploadForm() {
     const [message, setMessage] = useState("");
     const [loading, setLoading] = useState(false);
 
-    console.log("API URL:", process.env.REACT_APP_API_URL);
+    console.log("API URL:", process.env.REACT_APP_API_UPLOAD_URL);
 
     const handleUpload = async () => {
         if (!file) {
@@ -27,13 +27,16 @@ function UploadForm() {
             };
 
             try {
-                const res = await fetch(`${process.env.REACT_APP_API_URL}`, {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                    },
-                    body: JSON.stringify(payload),
-                });
+                const res = await fetch(
+                    `${process.env.REACT_APP_API_UPLOAD_URL}`,
+                    {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify(payload),
+                    }
+                );
 
                 const result = await res.json();
                 if (res.ok) {
