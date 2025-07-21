@@ -1,25 +1,19 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { withAuthenticator } from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import UploadForm from "./components/UploadForm";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+function App({ signOut, user }) {
+    return (
+        <div className="App" style={{ padding: "2rem" }}>
+            <h1>AI Invoice Scanner</h1>
+            <p>👤 Xin chào, {user.username}</p>
+            <button onClick={signOut}>Đăng xuất</button>
+
+            {/* Component Upload */}
+            <UploadForm />
+        </div>
+    );
 }
 
-export default App;
+export default withAuthenticator(App);
