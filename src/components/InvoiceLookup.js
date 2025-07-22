@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import InvoiceDetails from "./InvoiceDetails";
+import { mockInvoices } from "../mockData";
 
 function InvoiceLookup() {
     const [searchValue, setSearchValue] = useState("");
@@ -21,22 +22,41 @@ function InvoiceLookup() {
         setInvoiceData(null);
         setSelectedInvoice(null);
 
+        const useMock = process.env.REACT_APP_USE_MOCK === "true";
+        const keyword = searchValue.trim().toLowerCase();
+
         try {
-            let url = process.env.REACT_APP_API_GET_URL;
-            if (isInvoiceId(searchValue)) {
-                url += `/${encodeURIComponent(searchValue.trim())}`;
+            if (useMock) {
+                // Lọc mock data
+                const results = mockInvoices.filter((inv) =>
+                    isInvoiceId(keyword)
+                        ? inv.InvoiceId.toLowerCase().includes(keyword)
+                        : inv.CustomerName?.toLowerCase().includes(keyword)
+                );
+
+                if (!results.length) {
+                    throw new Error("Không tìm thấy hóa đơn.");
+                }
+
+                setInvoiceData(results);
             } else {
-                url += `?name=${encodeURIComponent(searchValue.trim())}`;
-            }
+                // Gọi API thật
+                let url = process.env.REACT_APP_API_GET_URL;
+                if (isInvoiceId(searchValue)) {
+                    url += `/${encodeURIComponent(searchValue.trim())}`;
+                } else {
+                    url += `?name=${encodeURIComponent(searchValue.trim())}`;
+                }
 
-            const res = await fetch(url, { method: "GET" });
-            if (!res.ok) {
-                const errMsg = await res.text();
-                throw new Error(errMsg || "Không tìm thấy hóa đơn");
-            }
+                const res = await fetch(url, { method: "GET" });
+                if (!res.ok) {
+                    const errMsg = await res.text();
+                    throw new Error(errMsg || "Không tìm thấy hóa đơn");
+                }
 
-            const data = await res.json();
-            setInvoiceData(data);
+                const data = await res.json();
+                setInvoiceData(data);
+            }
         } catch (err) {
             setError(`❌ Lỗi: ${err.message}`);
         } finally {
@@ -115,11 +135,30 @@ function InvoiceLookup() {
                 value={searchValue}
                 onChange={(e) => setSearchValue(e.target.value)}
                 disabled={loading}
-                style={{ marginRight: "0.5rem" }}
+                style={{
+                    marginRight: "0.5rem",
+                    padding: "0.5rem",
+                    borderRadius: "5px",
+                    border: "1px solid #ccc",
+                    width: "60%",
+                    maxWidth: "400px",
+                }}
             />
-            <button onClick={handleLookup} disabled={loading}>
+            <button
+                onClick={handleLookup}
+                disabled={loading}
+                style={{
+                    padding: "0.5rem 1rem",
+                    backgroundColor: "#007bff",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "5px",
+                    cursor: "pointer",
+                }}
+            >
                 {loading ? "Đang tra cứu..." : "Tra cứu"}
             </button>
+
             {error && <p style={{ color: "red" }}>{error}</p>}
 
             {invoiceData && !selectedInvoice && (

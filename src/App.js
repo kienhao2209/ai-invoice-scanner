@@ -4,70 +4,95 @@ import "@aws-amplify/ui-react/styles.css";
 import UploadForm from "./components/UploadForm";
 import InvoiceLookup from "./components/InvoiceLookup";
 import AllInvoices from "./components/AllInvoices";
+import Navigation from "./components/Navigation";
 import React, { useState } from "react";
 
 function App({ signOut, user }) {
     const [activePage, setActivePage] = useState("upload"); // 'upload', 'lookup', 'all'
 
+    const renderContent = () => {
+        switch (activePage) {
+            case "lookup":
+                return <InvoiceLookup />;
+            case "all":
+                return <AllInvoices />;
+            default:
+                return <UploadForm />;
+        }
+    };
+
     return (
         <div
-            className="App"
-            style={{ padding: "2rem", fontFamily: "Arial, sans-serif" }}
+            style={{
+                display: "flex",
+                height: "100vh",
+                fontFamily: "Segoe UI, sans-serif",
+            }}
         >
-            <h1>AI Invoice Scanner</h1>
-            <p>👤 Xin chào, {user.username}</p>
-            <button onClick={signOut}>Đăng xuất</button>
+            {/* Sidebar */}
+            <aside
+                style={{
+                    width: "240px",
+                    background: "#0d6efd",
+                    color: "white",
+                    display: "flex",
+                    flexDirection: "column",
+                    justifyContent: "space-between",
+                    padding: "2rem 1rem",
+                }}
+            >
+                <div>
+                    <h2 style={{ marginBottom: "2rem", textAlign: "center" }}>
+                        Invoice Scanner
+                    </h2>
+                    <Navigation
+                        activePage={activePage}
+                        setActivePage={setActivePage}
+                    />
+                </div>
+                <div style={{ textAlign: "center" }}>
+                    <p style={{ marginBottom: "0.5rem" }}>👤 {user.username}</p>
+                    <button
+                        onClick={signOut}
+                        style={{
+                            background: "#dc3545",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "4px",
+                            padding: "0.5rem 1rem",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Đăng xuất
+                    </button>
+                </div>
+            </aside>
 
-            <nav style={{ margin: "1rem 0" }}>
-                <button
-                    onClick={() => setActivePage("upload")}
+            {/* Main content */}
+            <div style={{ flex: 1, display: "flex", flexDirection: "column" }}>
+                {/* Header */}
+                <header
                     style={{
-                        marginRight: "1rem",
-                        background:
-                            activePage === "upload" ? "#007bff" : "#e0e0e0",
-                        color: activePage === "upload" ? "white" : "black",
-                        padding: "0.5rem 1rem",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
+                        background: "#f8f9fa",
+                        padding: "1rem 2rem",
+                        borderBottom: "1px solid #dee2e6",
                     }}
                 >
-                    Upload hóa đơn
-                </button>
-                <button
-                    onClick={() => setActivePage("lookup")}
-                    style={{
-                        marginRight: "1rem",
-                        background:
-                            activePage === "lookup" ? "#007bff" : "#e0e0e0",
-                        color: activePage === "lookup" ? "white" : "black",
-                        padding: "0.5rem 1rem",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                    }}
-                >
-                    Tra cứu hóa đơn
-                </button>
-                <button
-                    onClick={() => setActivePage("all")}
-                    style={{
-                        background:
-                            activePage === "all" ? "#007bff" : "#e0e0e0",
-                        color: activePage === "all" ? "white" : "black",
-                        padding: "0.5rem 1rem",
-                        border: "none",
-                        borderRadius: "5px",
-                        cursor: "pointer",
-                    }}
-                >
-                    Xem tất cả hóa đơn
-                </button>
-            </nav>
+                    <h3 style={{ margin: 0 }}>Dashboard</h3>
+                </header>
 
-            {activePage === "upload" && <UploadForm />}
-            {activePage === "lookup" && <InvoiceLookup />}
-            {activePage === "all" && <AllInvoices />}
+                {/* Page content */}
+                <main
+                    style={{
+                        flex: 1,
+                        padding: "2rem",
+                        background: "#f1f3f5",
+                        overflowY: "auto",
+                    }}
+                >
+                    {renderContent()}
+                </main>
+            </div>
         </div>
     );
 }
