@@ -8,6 +8,26 @@ function UploadForm() {
     const [dragActive, setDragActive] = useState(false);
     const inputRef = useRef(null);
 
+    const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+    const ALLOWED_TYPES = [
+        "application/pdf",
+        "image/png",
+        "image/jpeg",
+        "image/jpg",
+    ];
+
+    const validateFile = (selectedFile) => {
+        if (!ALLOWED_TYPES.includes(selectedFile.type)) {
+            setMessage("❌ Chỉ chấp nhận file PDF hoặc hình ảnh (JPG, PNG).");
+            return false;
+        }
+        if (selectedFile.size > MAX_FILE_SIZE) {
+            setMessage("❌ Dung lượng file vượt quá 10MB.");
+            return false;
+        }
+        return true;
+    };
+
     const handleUpload = async () => {
         if (!file) {
             setMessage("❌ Vui lòng chọn file trước khi upload.");
@@ -69,9 +89,12 @@ function UploadForm() {
     };
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
-        setMessage("");
-        setProgress(0);
+        const selectedFile = e.target.files[0];
+        if (selectedFile && validateFile(selectedFile)) {
+            setFile(selectedFile);
+            setMessage("");
+            setProgress(0);
+        }
     };
 
     const handleDrag = (e) => {
@@ -88,8 +111,9 @@ function UploadForm() {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
-        if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-            setFile(e.dataTransfer.files[0]);
+        const droppedFile = e.dataTransfer.files[0];
+        if (droppedFile && validateFile(droppedFile)) {
+            setFile(droppedFile);
             setMessage("");
             setProgress(0);
         }
@@ -113,7 +137,6 @@ function UploadForm() {
         >
             <h2>📤 Upload Hóa Đơn</h2>
 
-            {/* Vùng kéo-thả */}
             <div
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -134,6 +157,9 @@ function UploadForm() {
                 <p>
                     Kéo và thả file vào đây hoặc{" "}
                     <strong>bấm để chọn file</strong>
+                </p>
+                <p style={{ fontSize: "0.9rem", color: "#666" }}>
+                    (Chỉ chấp nhận PDF/JPG/PNG, tối đa 10MB)
                 </p>
             </div>
 

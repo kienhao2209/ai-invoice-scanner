@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import InvoiceDetails from "./InvoiceDetails";
-import { mockInvoices } from "../mockData";
 
 function InvoiceLookup() {
     const [searchValue, setSearchValue] = useState("");
@@ -22,41 +21,24 @@ function InvoiceLookup() {
         setInvoiceData(null);
         setSelectedInvoice(null);
 
-        const useMock = process.env.REACT_APP_USE_MOCK === "true";
-        const keyword = searchValue.trim().toLowerCase();
+        const keyword = searchValue.trim();
 
         try {
-            if (useMock) {
-                // Lọc mock data
-                const results = mockInvoices.filter((inv) =>
-                    isInvoiceId(keyword)
-                        ? inv.InvoiceId.toLowerCase().includes(keyword)
-                        : inv.CustomerName?.toLowerCase().includes(keyword)
-                );
-
-                if (!results.length) {
-                    throw new Error("Không tìm thấy hóa đơn.");
-                }
-
-                setInvoiceData(results);
+            let url = process.env.REACT_APP_API_GET_URL;
+            if (isInvoiceId(keyword)) {
+                url += `/${encodeURIComponent(keyword)}`;
             } else {
-                // Gọi API thật
-                let url = process.env.REACT_APP_API_GET_URL;
-                if (isInvoiceId(searchValue)) {
-                    url += `/${encodeURIComponent(searchValue.trim())}`;
-                } else {
-                    url += `?name=${encodeURIComponent(searchValue.trim())}`;
-                }
-
-                const res = await fetch(url, { method: "GET" });
-                if (!res.ok) {
-                    const errMsg = await res.text();
-                    throw new Error(errMsg || "Không tìm thấy hóa đơn");
-                }
-
-                const data = await res.json();
-                setInvoiceData(data);
+                url += `?name=${encodeURIComponent(keyword)}`;
             }
+
+            const res = await fetch(url, { method: "GET" });
+            if (!res.ok) {
+                const errMsg = await res.text();
+                throw new Error(errMsg || "Không tìm thấy hóa đơn");
+            }
+
+            const data = await res.json();
+            setInvoiceData(data);
         } catch (err) {
             setError(`❌ Lỗi: ${err.message}`);
         } finally {
