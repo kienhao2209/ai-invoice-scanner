@@ -1,12 +1,12 @@
 import React, { useState } from "react";
+import InvoiceDetails from "./InvoiceDetails";
 
 function InvoiceLookup() {
     const [searchValue, setSearchValue] = useState("");
     const [invoiceData, setInvoiceData] = useState(null);
+    const [selectedInvoice, setSelectedInvoice] = useState(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-
-    console.log("GET URL:", process.env.REACT_APP_API_GET_URL);
 
     const isInvoiceId = (value) => /^[A-Za-z0-9-]+$/.test(value.trim());
 
@@ -19,6 +19,7 @@ function InvoiceLookup() {
         setLoading(true);
         setError("");
         setInvoiceData(null);
+        setSelectedInvoice(null);
 
         try {
             let url = process.env.REACT_APP_API_GET_URL;
@@ -54,6 +55,7 @@ function InvoiceLookup() {
                     borderCollapse: "collapse",
                     width: "100%",
                     marginTop: "1rem",
+                    cursor: "pointer",
                 }}
             >
                 <thead>
@@ -68,7 +70,11 @@ function InvoiceLookup() {
                 </thead>
                 <tbody>
                     {invoices.map((inv, index) => (
-                        <tr key={index}>
+                        <tr
+                            key={index}
+                            onClick={() => setSelectedInvoice(inv)}
+                            style={{ backgroundColor: "#fff" }}
+                        >
                             <td style={tdStyle}>{inv.InvoiceId}</td>
                             <td style={tdStyle}>{inv.CustomerName}</td>
                             <td style={tdStyle}>{inv.InvoiceDate}</td>
@@ -116,11 +122,18 @@ function InvoiceLookup() {
             </button>
             {error && <p style={{ color: "red" }}>{error}</p>}
 
-            {invoiceData && (
+            {invoiceData && !selectedInvoice && (
                 <div style={{ textAlign: "center", marginTop: "1rem" }}>
                     <h3 style={{ textAlign: "left" }}>Kết quả tra cứu</h3>
                     {renderTable(invoiceData)}
                 </div>
+            )}
+
+            {selectedInvoice && (
+                <InvoiceDetails
+                    invoice={selectedInvoice}
+                    onClose={() => setSelectedInvoice(null)}
+                />
             )}
         </div>
     );
