@@ -285,6 +285,8 @@
 import React, { useEffect, useState } from "react";
 import InvoiceDetails from "./InvoiceDetails";
 import { mockInvoices } from "../mockData";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 function AllInvoices() {
     const [invoices, setInvoices] = useState([]);
@@ -372,6 +374,18 @@ function AllInvoices() {
         setFilteredInvoices(result);
         setCurrentPage(1);
     }, [searchTerm, startDate, endDate, sortField, sortOrder, invoices]);
+
+    const exportToExcel = () => {
+        const ws = XLSX.utils.json_to_sheet(filteredInvoices);
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Invoices");
+
+        const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+        const data = new Blob([excelBuffer], {
+            type: "application/octet-stream",
+        });
+        saveAs(data, "Invoices.xlsx");
+    };
 
     if (loading) return <p>⏳ Đang tải danh sách hóa đơn...</p>;
     if (error) return <p style={{ color: "red" }}>❌ {error}</p>;
@@ -476,6 +490,20 @@ function AllInvoices() {
                     <option value="desc">Giảm dần</option>
                     <option value="asc">Tăng dần</option>
                 </select>
+
+                <button
+                    onClick={exportToExcel}
+                    style={{
+                        padding: "0.5rem 1rem",
+                        backgroundColor: "#28a745",
+                        color: "white",
+                        border: "none",
+                        borderRadius: "5px",
+                        cursor: "pointer",
+                    }}
+                >
+                    ⬇ Xuất Excel
+                </button>
             </div>
 
             {/* Bảng dữ liệu */}

@@ -126,6 +126,7 @@ function InvoiceLookup() {
                 padding: "1rem",
                 marginTop: "1rem",
                 borderRadius: "8px",
+                textAlign: "center",
             }}
         >
             <h2>🔍 Tra cứu Hóa Đơn</h2>
