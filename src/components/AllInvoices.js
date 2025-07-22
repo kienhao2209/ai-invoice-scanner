@@ -21,6 +21,10 @@ function AllInvoices({ filterTag }) {
     const [sortField, setSortField] = useState("InvoiceDate");
     const [sortOrder, setSortOrder] = useState("desc");
 
+    // Lọc theo tag trong component
+    const [availableTags, setAvailableTags] = useState([]);
+    const [selectedTag, setSelectedTag] = useState(filterTag || "");
+
     // Phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
@@ -35,6 +39,10 @@ function AllInvoices({ filterTag }) {
                 if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
                 const data = await res.json();
                 setInvoices(data);
+
+                // Cập nhật tags có sẵn
+                const allTags = data.flatMap((inv) => inv.Tags || []);
+                setAvailableTags([...new Set(allTags)]);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -44,13 +52,14 @@ function AllInvoices({ filterTag }) {
         fetchInvoices();
     }, []);
 
-    // Lọc dữ liệu mỗi khi invoices, filterTag hoặc các điều kiện lọc thay đổi
+    // Lọc dữ liệu mỗi khi invoices, selectedTag, filterTag hoặc các điều kiện lọc thay đổi
     useEffect(() => {
         let result = invoices;
 
-        // Lọc theo tag nếu có filterTag từ menu
-        if (filterTag) {
-            result = result.filter((inv) => inv.Tags?.includes(filterTag));
+        // Lọc theo tag từ filterTag (App.js) hoặc selectedTag (dropdown)
+        const tagToFilter = selectedTag || filterTag;
+        if (tagToFilter) {
+            result = result.filter((inv) => inv.Tags?.includes(tagToFilter));
         }
 
         // Lọc theo tìm kiếm
@@ -98,6 +107,7 @@ function AllInvoices({ filterTag }) {
         sortOrder,
         invoices,
         filterTag,
+        selectedTag,
     ]);
 
     const exportToExcel = () => {
@@ -117,6 +127,10 @@ function AllInvoices({ filterTag }) {
             inv.InvoiceId === invoiceId ? { ...inv, Tags: newTags } : inv
         );
         setInvoices(updated);
+
+        // Cập nhật lại danh sách tags
+        const allTags = updated.flatMap((inv) => inv.Tags || []);
+        setAvailableTags([...new Set(allTags)]);
     };
 
     if (loading) return <p>⏳ Đang tải danh sách hóa đơn...</p>;
@@ -154,7 +168,12 @@ function AllInvoices({ filterTag }) {
 
     return (
         <div>
-            <h2>📜 Tất cả hóa đơn {filterTag ? `(Tag: ${filterTag})` : ""}</h2>
+            <h2>
+                📜 Tất cả hóa đơn{" "}
+                {selectedTag || filterTag
+                    ? `(Tag: ${selectedTag || filterTag})`
+                    : ""}
+            </h2>
 
             {/* Bộ lọc */}
             <div
@@ -221,6 +240,39 @@ function AllInvoices({ filterTag }) {
                     <option value="desc">Giảm dần</option>
                     <option value="asc">Tăng dần</option>
                 </select>
+
+                {/* Lọc theo Tag */}
+                <select
+                    value={selectedTag}
+                    onChange={(e) => setSelectedTag(e.target.value)}
+                    style={{
+                        padding: "0.5rem",
+                        border: "1px solid #ccc",
+                        borderRadius: "5px",
+                    }}
+                >
+                    <option value="">-- Lọc theo Tag --</option>
+                    {availableTags.map((tag, idx) => (
+                        <option key={idx} value={tag}>
+                            {tag}
+                        </option>
+                    ))}
+                </select>
+                {selectedTag && (
+                    <button
+                        onClick={() => setSelectedTag("")}
+                        style={{
+                            padding: "0.5rem 1rem",
+                            backgroundColor: "#dc3545",
+                            color: "white",
+                            border: "none",
+                            borderRadius: "5px",
+                            cursor: "pointer",
+                        }}
+                    >
+                        Xóa lọc
+                    </button>
+                )}
 
                 <button
                     onClick={exportToExcel}
