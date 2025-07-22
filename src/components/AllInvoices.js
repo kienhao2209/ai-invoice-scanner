@@ -4,7 +4,7 @@ import TagEditorModal from "./TagEditorModal";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 
-function AllInvoices() {
+function AllInvoices({ filterTag }) {
     const [invoices, setInvoices] = useState([]);
     const [filteredInvoices, setFilteredInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -35,7 +35,6 @@ function AllInvoices() {
                 if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
                 const data = await res.json();
                 setInvoices(data);
-                setFilteredInvoices(data);
             } catch (err) {
                 setError(err.message);
             } finally {
@@ -45,9 +44,16 @@ function AllInvoices() {
         fetchInvoices();
     }, []);
 
+    // Lọc dữ liệu mỗi khi invoices, filterTag hoặc các điều kiện lọc thay đổi
     useEffect(() => {
         let result = invoices;
 
+        // Lọc theo tag nếu có filterTag từ menu
+        if (filterTag) {
+            result = result.filter((inv) => inv.Tags?.includes(filterTag));
+        }
+
+        // Lọc theo tìm kiếm
         result = result.filter(
             (inv) =>
                 inv.CustomerName?.toLowerCase().includes(
@@ -56,6 +62,7 @@ function AllInvoices() {
                 inv.InvoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
+        // Lọc theo ngày
         if (startDate) {
             result = result.filter(
                 (inv) => new Date(inv.InvoiceDate) >= new Date(startDate)
@@ -67,6 +74,7 @@ function AllInvoices() {
             );
         }
 
+        // Sắp xếp
         result = result.sort((a, b) => {
             const fieldA =
                 sortField === "TotalAmount"
@@ -82,7 +90,15 @@ function AllInvoices() {
 
         setFilteredInvoices(result);
         setCurrentPage(1);
-    }, [searchTerm, startDate, endDate, sortField, sortOrder, invoices]);
+    }, [
+        searchTerm,
+        startDate,
+        endDate,
+        sortField,
+        sortOrder,
+        invoices,
+        filterTag,
+    ]);
 
     const exportToExcel = () => {
         const ws = XLSX.utils.json_to_sheet(filteredInvoices);
@@ -138,7 +154,7 @@ function AllInvoices() {
 
     return (
         <div>
-            <h2>📜 Tất cả hóa đơn</h2>
+            <h2>📜 Tất cả hóa đơn {filterTag ? `(Tag: ${filterTag})` : ""}</h2>
 
             {/* Bộ lọc */}
             <div

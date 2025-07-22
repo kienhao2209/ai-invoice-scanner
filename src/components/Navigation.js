@@ -1,11 +1,12 @@
 import React from "react";
-import { FaCloudUploadAlt, FaSearch, FaListUl } from "react-icons/fa";
+import { FaCloudUploadAlt, FaSearch, FaListUl, FaTags } from "react-icons/fa";
 
 function Navigation({ activePage, setActivePage }) {
     const navItems = [
         { id: "upload", label: "Upload hóa đơn", icon: <FaCloudUploadAlt /> },
         { id: "lookup", label: "Tra cứu hóa đơn", icon: <FaSearch /> },
         { id: "all", label: "Xem tất cả hóa đơn", icon: <FaListUl /> },
+        { id: "categories", label: "Danh mục hóa đơn", icon: <FaTags /> },
     ];
 
     return (

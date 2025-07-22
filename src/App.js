@@ -6,16 +6,27 @@ import InvoiceLookup from "./components/InvoiceLookup";
 import AllInvoices from "./components/AllInvoices";
 import Navigation from "./components/Navigation";
 import React, { useState } from "react";
+import InvoiceCategories from "./components/InvoiceCategories";
 
 function App({ signOut, user }) {
-    const [activePage, setActivePage] = useState("upload"); // 'upload', 'lookup', 'all'
+    const [activePage, setActivePage] = useState("upload"); // 'upload', 'lookup', 'all', 'categories'
+    const [filterTag, setFilterTag] = useState(null); // tag để lọc trong AllInvoices
 
     const renderContent = () => {
         switch (activePage) {
             case "lookup":
                 return <InvoiceLookup />;
             case "all":
-                return <AllInvoices />;
+                return <AllInvoices filterTag={filterTag} />;
+            case "categories":
+                return (
+                    <InvoiceCategories
+                        onSelectCategory={(tag) => {
+                            setFilterTag(tag);
+                            setActivePage("all");
+                        }}
+                    />
+                );
             default:
                 return <UploadForm />;
         }
@@ -47,7 +58,11 @@ function App({ signOut, user }) {
                     </h2>
                     <Navigation
                         activePage={activePage}
-                        setActivePage={setActivePage}
+                        setActivePage={(page) => {
+                            // Khi quay lại AllInvoices từ menu, reset filterTag
+                            if (page === "all") setFilterTag(null);
+                            setActivePage(page);
+                        }}
                     />
                 </div>
                 <div style={{ textAlign: "center" }}>
