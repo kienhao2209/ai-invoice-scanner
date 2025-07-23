@@ -9,7 +9,7 @@ import React, { useState } from "react";
 import InvoiceCategories from "./components/InvoiceCategories";
 
 function App({ signOut, user }) {
-    const [activePage, setActivePage] = useState("upload"); // 'upload', 'lookup', 'all', 'categories'
+    const [activePage, setActivePage] = useState("upload"); // 'upload', 'lookup', 'all', 'categories', 'starred'
     const [filterTag, setFilterTag] = useState(null); // tag để lọc trong AllInvoices
 
     const renderContent = () => {
@@ -25,6 +25,13 @@ function App({ signOut, user }) {
                             setFilterTag(tag);
                             setActivePage("all");
                         }}
+                    />
+                );
+            case "starred":
+                return (
+                    <AllInvoices
+                        filterTag={null}
+                        showStarredOnly={true} // mới thêm
                     />
                 );
             default:

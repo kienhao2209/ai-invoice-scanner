@@ -5,7 +5,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import mockInvoices from "../mockData/invoices"; // import mock data
 
-function AllInvoices({ filterTag }) {
+function AllInvoices({ filterTag, showStarredOnly = false }) {
     const [invoices, setInvoices] = useState([]);
     const [filteredInvoices, setFilteredInvoices] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -36,28 +36,28 @@ function AllInvoices({ filterTag }) {
     const itemsPerPage = 5;
 
     // API thật
-    useEffect(() => {
-        const fetchInvoices = async () => {
-            try {
-                const res = await fetch(
-                    `${process.env.REACT_APP_API_GET_URL}`,
-                    { method: "GET" }
-                );
-                if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
-                const data = await res.json();
-                setInvoices(data);
+    // useEffect(() => {
+    //     const fetchInvoices = async () => {
+    //         try {
+    //             const res = await fetch(
+    //                 `${process.env.REACT_APP_API_GET_URL}`,
+    //                 { method: "GET" }
+    //             );
+    //             if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
+    //             const data = await res.json();
+    //             setInvoices(data);
 
-                // Cập nhật tags có sẵn
-                const allTags = data.flatMap((inv) => inv.Tags || []);
-                setAvailableTags([...new Set(allTags)]);
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchInvoices();
-    }, []);
+    //             // Cập nhật tags có sẵn
+    //             const allTags = data.flatMap((inv) => inv.Tags || []);
+    //             setAvailableTags([...new Set(allTags)]);
+    //         } catch (err) {
+    //             setError(err.message);
+    //         } finally {
+    //             setLoading(false);
+    //         }
+    //     };
+    //     fetchInvoices();
+    // }, []);
 
     // MockData
     useEffect(() => {
@@ -73,8 +73,16 @@ function AllInvoices({ filterTag }) {
         }
     }, []);
 
+    // ---------- Cập nhật đoạn mã mới 8:02 (23/07) ----------
     useEffect(() => {
         let result = invoices;
+
+        // Nếu bật chế độ chỉ xem hóa đơn quan trọng
+        if (showStarredOnly) {
+            result = result.filter((inv) =>
+                starredInvoices.includes(inv.InvoiceId)
+            );
+        }
 
         const tagToFilter = selectedTag || filterTag;
         if (tagToFilter) {
@@ -124,6 +132,8 @@ function AllInvoices({ filterTag }) {
         invoices,
         filterTag,
         selectedTag,
+        starredInvoices,
+        showStarredOnly,
     ]);
 
     // ---------- Thêm đoạn mã mới 7:40 (23/07) ----------
