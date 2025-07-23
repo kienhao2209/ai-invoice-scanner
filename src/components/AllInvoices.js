@@ -3,7 +3,7 @@ import InvoiceDetails from "./InvoiceDetails";
 import TagEditorModal from "./TagEditorModal";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import mockInvoices from "../mockData/invoices"; // import mock data
+import mockInvoices from "../mockData/invoices";
 
 function AllInvoices({ filterTag, showStarredOnly = false }) {
     const [invoices, setInvoices] = useState([]);
@@ -26,61 +26,124 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
     const [availableTags, setAvailableTags] = useState([]);
     const [selectedTag, setSelectedTag] = useState(filterTag || "");
 
-    // ---------- Thêm đoạn mã mới 7:40 (23/07) ----------
-    const [starredInvoices, setStarredInvoices] = useState(
-        JSON.parse(localStorage.getItem("starredInvoices") || "[]")
-    );
+    // ---------- Thêm đoạn mã mới 7:40 (23/07) || localStorage ----------
+    // const [starredInvoices, setStarredInvoices] = useState(
+    //     JSON.parse(localStorage.getItem("starredInvoices") || "[]")
+    // );
 
     // Phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
     // API thật
-    // useEffect(() => {
-    //     const fetchInvoices = async () => {
-    //         try {
-    //             const res = await fetch(
-    //                 `${process.env.REACT_APP_API_GET_URL}`,
-    //                 { method: "GET" }
-    //             );
-    //             if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
-    //             const data = await res.json();
-    //             setInvoices(data);
-
-    //             // Cập nhật tags có sẵn
-    //             const allTags = data.flatMap((inv) => inv.Tags || []);
-    //             setAvailableTags([...new Set(allTags)]);
-    //         } catch (err) {
-    //             setError(err.message);
-    //         } finally {
-    //             setLoading(false);
-    //         }
-    //     };
-    //     fetchInvoices();
-    // }, []);
-
-    // MockData
     useEffect(() => {
-        try {
-            setInvoices(mockInvoices);
+        const fetchInvoices = async () => {
+            try {
+                const res = await fetch(
+                    `${process.env.REACT_APP_API_GET_URL}`,
+                    { method: "GET" }
+                );
+                if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
+                const data = await res.json();
+                setInvoices(data);
 
-            const allTags = mockInvoices.flatMap((inv) => inv.Tags || []);
-            setAvailableTags([...new Set(allTags)]);
-        } catch (err) {
-            setError("Không thể tải dữ liệu mock");
-        } finally {
-            setLoading(false);
-        }
+                // Cập nhật tags có sẵn
+                const allTags = data.flatMap((inv) => inv.Tags || []);
+                setAvailableTags([...new Set(allTags)]);
+            } catch (err) {
+                setError(err.message);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchInvoices();
     }, []);
 
-    // ---------- Cập nhật đoạn mã mới 8:02 (23/07) ----------
+    // MockData
+    // useEffect(() => {
+    //     try {
+    //         setInvoices(mockInvoices);
+
+    //         const allTags = mockInvoices.flatMap((inv) => inv.Tags || []);
+    //         setAvailableTags([...new Set(allTags)]);
+    //     } catch (err) {
+    //         setError("Không thể tải dữ liệu mock");
+    //     } finally {
+    //         setLoading(false);
+    //     }
+    // }, []);
+
+    // ---------- Cập nhật đoạn mã mới 8:02 (23/07) || localStorage ----------
+    // useEffect(() => {
+    //     let result = invoices;
+
+    //     // Nếu bật chế độ chỉ xem hóa đơn quan trọng
+    //     if (showStarredOnly) {
+    //         result = result.filter((inv) =>
+    //             starredInvoices.includes(inv.InvoiceId)
+    //         );
+    //     }
+
+    //     const tagToFilter = selectedTag || filterTag;
+    //     if (tagToFilter) {
+    //         result = result.filter((inv) => inv.Tags?.includes(tagToFilter));
+    //     }
+
+    //     result = result.filter(
+    //         (inv) =>
+    //             inv.CustomerName?.toLowerCase().includes(
+    //                 searchTerm.toLowerCase()
+    //             ) ||
+    //             inv.InvoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
+    //     );
+
+    //     if (startDate) {
+    //         result = result.filter(
+    //             (inv) => new Date(inv.InvoiceDate) >= new Date(startDate)
+    //         );
+    //     }
+    //     if (endDate) {
+    //         result = result.filter(
+    //             (inv) => new Date(inv.InvoiceDate) <= new Date(endDate)
+    //         );
+    //     }
+
+    //     result = result.sort((a, b) => {
+    //         const fieldA =
+    //             sortField === "TotalAmount"
+    //                 ? parseFloat(a.TotalAmount)
+    //                 : new Date(a.InvoiceDate);
+    //         const fieldB =
+    //             sortField === "TotalAmount"
+    //                 ? parseFloat(b.TotalAmount)
+    //                 : new Date(b.InvoiceDate);
+    //         if (sortOrder === "asc") return fieldA > fieldB ? 1 : -1;
+    //         return fieldA < fieldB ? 1 : -1;
+    //     });
+
+    //     setFilteredInvoices(result);
+    //     setCurrentPage(1);
+    // }, [
+    //     searchTerm,
+    //     startDate,
+    //     endDate,
+    //     sortField,
+    //     sortOrder,
+    //     invoices,
+    //     filterTag,
+    //     selectedTag,
+    //     starredInvoices,
+    //     showStarredOnly,
+    // ]);
+
+    // ---------- Cập nhật đoạn mã mới 13:59 (23/07) || API thật ----------
     useEffect(() => {
         let result = invoices;
 
-        // Nếu bật chế độ chỉ xem hóa đơn quan trọng
+        // Lọc theo hóa đơn Starred
         if (showStarredOnly) {
-            result = result.filter((inv) =>
-                starredInvoices.includes(inv.InvoiceId)
+            result = result.filter(
+                (inv) => inv.Starred === "true" || inv.Starred === true
             );
         }
 
@@ -89,6 +152,7 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
             result = result.filter((inv) => inv.Tags?.includes(tagToFilter));
         }
 
+        // Tìm kiếm
         result = result.filter(
             (inv) =>
                 inv.CustomerName?.toLowerCase().includes(
@@ -97,6 +161,7 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
                 inv.InvoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
+        // Lọc theo ngày
         if (startDate) {
             result = result.filter(
                 (inv) => new Date(inv.InvoiceDate) >= new Date(startDate)
@@ -108,6 +173,7 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
             );
         }
 
+        // Sắp xếp
         result = result.sort((a, b) => {
             const fieldA =
                 sortField === "TotalAmount"
@@ -117,8 +183,7 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
                 sortField === "TotalAmount"
                     ? parseFloat(b.TotalAmount)
                     : new Date(b.InvoiceDate);
-            if (sortOrder === "asc") return fieldA > fieldB ? 1 : -1;
-            return fieldA < fieldB ? 1 : -1;
+            return sortOrder === "asc" ? fieldA - fieldB : fieldB - fieldA;
         });
 
         setFilteredInvoices(result);
@@ -132,23 +197,21 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
         invoices,
         filterTag,
         selectedTag,
-        starredInvoices,
         showStarredOnly,
     ]);
 
-    // ---------- Thêm đoạn mã mới 7:40 (23/07) ----------
-    useEffect(() => {
-        localStorage.setItem(
-            "starredInvoices",
-            JSON.stringify(starredInvoices)
-        );
-    }, [starredInvoices]);
+    // ---------- Thêm đoạn mã mới 7:40 (23/07) || localStorage ----------
+    // useEffect(() => {
+    //     localStorage.setItem(
+    //         "starredInvoices",
+    //         JSON.stringify(starredInvoices)
+    //     );
+    // }, [starredInvoices]);
 
     const exportToExcel = () => {
         const ws = XLSX.utils.json_to_sheet(filteredInvoices);
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, "Invoices");
-
         const excelBuffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
         const data = new Blob([excelBuffer], {
             type: "application/octet-stream",
@@ -166,13 +229,49 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
         setAvailableTags([...new Set(allTags)]);
     };
 
-    // ---------- Thêm đoạn mã mới 7:40 (23/07) ----------
-    const toggleStar = (invoiceId) => {
-        setStarredInvoices((prev) =>
-            prev.includes(invoiceId)
-                ? prev.filter((id) => id !== invoiceId)
-                : [...prev, invoiceId]
-        );
+    // ---------- Thêm đoạn mã mới 7:40 (23/07) || localStorage ----------
+    // const toggleStar = (invoiceId) => {
+    //     setStarredInvoices((prev) =>
+    //         prev.includes(invoiceId)
+    //             ? prev.filter((id) => id !== invoiceId)
+    //             : [...prev, invoiceId]
+    //     );
+    // };
+
+    // ---------- Thêm đoạn mã mới 14:02 (23/07) || API thật ----------
+    const toggleStar = async (invoiceId, currentStarred) => {
+        try {
+            const response = await fetch(
+                `${process.env.REACT_APP_API_BASE_URL}/invoice/starred/${invoiceId}`,
+                {
+                    method: "PATCH",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        starred: !(
+                            currentStarred === "true" || currentStarred === true
+                        ),
+                    }),
+                }
+            );
+
+            if (!response.ok) throw new Error("Không cập nhật được Starred");
+
+            setInvoices((prev) =>
+                prev.map((inv) =>
+                    inv.InvoiceId === invoiceId
+                        ? {
+                              ...inv,
+                              Starred: !(
+                                  currentStarred === "true" ||
+                                  currentStarred === true
+                              ),
+                          }
+                        : inv
+                )
+            );
+        } catch (err) {
+            alert(err.message);
+        }
     };
 
     if (loading) return <p>⏳ Đang tải danh sách hóa đơn...</p>;
@@ -341,9 +440,7 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
             >
                 <thead>
                     <tr>
-                        {/* ---------- Thêm đoạn mã mới 7:40 (23/07) ---------- */}
                         <th style={thStyle}>⭐</th>
-
                         <th style={thStyle}>Invoice ID</th>
                         <th style={thStyle}>Customer Name</th>
                         <th style={thStyle}>Invoice Date</th>
@@ -355,19 +452,22 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
                 <tbody>
                     {currentInvoices.map((invoice) => (
                         <tr key={invoice.InvoiceId}>
-                            {/* ---------- Thêm đoạn mã mới 7:40 (23/07) ---------- */}
                             <td style={tdStyle}>
                                 <span
                                     onClick={() =>
-                                        toggleStar(invoice.InvoiceId)
+                                        toggleStar(
+                                            invoice.InvoiceId,
+                                            invoice.Starred === "true" ||
+                                                invoice.Starred === true
+                                        )
                                     }
                                     style={{
                                         cursor: "pointer",
-                                        color: starredInvoices.includes(
-                                            invoice.InvoiceId
-                                        )
-                                            ? "gold"
-                                            : "#ccc",
+                                        color:
+                                            invoice.Starred === "true" ||
+                                            invoice.Starred === true
+                                                ? "gold"
+                                                : "#ccc",
                                     }}
                                 >
                                     ★
