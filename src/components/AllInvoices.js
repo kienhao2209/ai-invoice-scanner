@@ -3,6 +3,7 @@ import InvoiceDetails from "./InvoiceDetails";
 import TagEditorModal from "./TagEditorModal";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import mockInvoices from "../mockData/invoices"; // import mock data
 
 function AllInvoices({ filterTag }) {
     const [invoices, setInvoices] = useState([]);
@@ -25,10 +26,16 @@ function AllInvoices({ filterTag }) {
     const [availableTags, setAvailableTags] = useState([]);
     const [selectedTag, setSelectedTag] = useState(filterTag || "");
 
+    // ---------- Thêm đoạn mã mới 7:40 (23/07) ----------
+    const [starredInvoices, setStarredInvoices] = useState(
+        JSON.parse(localStorage.getItem("starredInvoices") || "[]")
+    );
+
     // Phân trang
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 5;
 
+    // API thật
     useEffect(() => {
         const fetchInvoices = async () => {
             try {
@@ -52,17 +59,28 @@ function AllInvoices({ filterTag }) {
         fetchInvoices();
     }, []);
 
-    // Lọc dữ liệu mỗi khi invoices, selectedTag, filterTag hoặc các điều kiện lọc thay đổi
+    // MockData
+    useEffect(() => {
+        try {
+            setInvoices(mockInvoices);
+
+            const allTags = mockInvoices.flatMap((inv) => inv.Tags || []);
+            setAvailableTags([...new Set(allTags)]);
+        } catch (err) {
+            setError("Không thể tải dữ liệu mock");
+        } finally {
+            setLoading(false);
+        }
+    }, []);
+
     useEffect(() => {
         let result = invoices;
 
-        // Lọc theo tag từ filterTag (App.js) hoặc selectedTag (dropdown)
         const tagToFilter = selectedTag || filterTag;
         if (tagToFilter) {
             result = result.filter((inv) => inv.Tags?.includes(tagToFilter));
         }
 
-        // Lọc theo tìm kiếm
         result = result.filter(
             (inv) =>
                 inv.CustomerName?.toLowerCase().includes(
@@ -71,7 +89,6 @@ function AllInvoices({ filterTag }) {
                 inv.InvoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-        // Lọc theo ngày
         if (startDate) {
             result = result.filter(
                 (inv) => new Date(inv.InvoiceDate) >= new Date(startDate)
@@ -83,7 +100,6 @@ function AllInvoices({ filterTag }) {
             );
         }
 
-        // Sắp xếp
         result = result.sort((a, b) => {
             const fieldA =
                 sortField === "TotalAmount"
@@ -110,6 +126,14 @@ function AllInvoices({ filterTag }) {
         selectedTag,
     ]);
 
+    // ---------- Thêm đoạn mã mới 7:40 (23/07) ----------
+    useEffect(() => {
+        localStorage.setItem(
+            "starredInvoices",
+            JSON.stringify(starredInvoices)
+        );
+    }, [starredInvoices]);
+
     const exportToExcel = () => {
         const ws = XLSX.utils.json_to_sheet(filteredInvoices);
         const wb = XLSX.utils.book_new();
@@ -128,9 +152,17 @@ function AllInvoices({ filterTag }) {
         );
         setInvoices(updated);
 
-        // Cập nhật lại danh sách tags
         const allTags = updated.flatMap((inv) => inv.Tags || []);
         setAvailableTags([...new Set(allTags)]);
+    };
+
+    // ---------- Thêm đoạn mã mới 7:40 (23/07) ----------
+    const toggleStar = (invoiceId) => {
+        setStarredInvoices((prev) =>
+            prev.includes(invoiceId)
+                ? prev.filter((id) => id !== invoiceId)
+                : [...prev, invoiceId]
+        );
     };
 
     if (loading) return <p>⏳ Đang tải danh sách hóa đơn...</p>;
@@ -299,6 +331,9 @@ function AllInvoices({ filterTag }) {
             >
                 <thead>
                     <tr>
+                        {/* ---------- Thêm đoạn mã mới 7:40 (23/07) ---------- */}
+                        <th style={thStyle}>⭐</th>
+
                         <th style={thStyle}>Invoice ID</th>
                         <th style={thStyle}>Customer Name</th>
                         <th style={thStyle}>Invoice Date</th>
@@ -310,6 +345,25 @@ function AllInvoices({ filterTag }) {
                 <tbody>
                     {currentInvoices.map((invoice) => (
                         <tr key={invoice.InvoiceId}>
+                            {/* ---------- Thêm đoạn mã mới 7:40 (23/07) ---------- */}
+                            <td style={tdStyle}>
+                                <span
+                                    onClick={() =>
+                                        toggleStar(invoice.InvoiceId)
+                                    }
+                                    style={{
+                                        cursor: "pointer",
+                                        color: starredInvoices.includes(
+                                            invoice.InvoiceId
+                                        )
+                                            ? "gold"
+                                            : "#ccc",
+                                    }}
+                                >
+                                    ★
+                                </span>
+                            </td>
+
                             <td style={tdStyle}>{invoice.InvoiceId}</td>
                             <td style={tdStyle}>{invoice.CustomerName}</td>
                             <td style={tdStyle}>{invoice.InvoiceDate}</td>
