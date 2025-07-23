@@ -3,7 +3,6 @@ import InvoiceDetails from "./InvoiceDetails";
 import TagEditorModal from "./TagEditorModal";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import mockInvoices from "../mockData/invoices";
 
 function AllInvoices({ filterTag, showStarredOnly = false }) {
     const [invoices, setInvoices] = useState([]);
@@ -25,11 +24,6 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
     // Lọc theo tag trong component
     const [availableTags, setAvailableTags] = useState([]);
     const [selectedTag, setSelectedTag] = useState(filterTag || "");
-
-    // ---------- Thêm đoạn mã mới 7:40 (23/07) || localStorage ----------
-    // const [starredInvoices, setStarredInvoices] = useState(
-    //     JSON.parse(localStorage.getItem("starredInvoices") || "[]")
-    // );
 
     // Phân trang
     const [currentPage, setCurrentPage] = useState(1);
@@ -59,84 +53,6 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
         fetchInvoices();
     }, []);
 
-    // MockData
-    // useEffect(() => {
-    //     try {
-    //         setInvoices(mockInvoices);
-
-    //         const allTags = mockInvoices.flatMap((inv) => inv.Tags || []);
-    //         setAvailableTags([...new Set(allTags)]);
-    //     } catch (err) {
-    //         setError("Không thể tải dữ liệu mock");
-    //     } finally {
-    //         setLoading(false);
-    //     }
-    // }, []);
-
-    // ---------- Cập nhật đoạn mã mới 8:02 (23/07) || localStorage ----------
-    // useEffect(() => {
-    //     let result = invoices;
-
-    //     // Nếu bật chế độ chỉ xem hóa đơn quan trọng
-    //     if (showStarredOnly) {
-    //         result = result.filter((inv) =>
-    //             starredInvoices.includes(inv.InvoiceId)
-    //         );
-    //     }
-
-    //     const tagToFilter = selectedTag || filterTag;
-    //     if (tagToFilter) {
-    //         result = result.filter((inv) => inv.Tags?.includes(tagToFilter));
-    //     }
-
-    //     result = result.filter(
-    //         (inv) =>
-    //             inv.CustomerName?.toLowerCase().includes(
-    //                 searchTerm.toLowerCase()
-    //             ) ||
-    //             inv.InvoiceId?.toLowerCase().includes(searchTerm.toLowerCase())
-    //     );
-
-    //     if (startDate) {
-    //         result = result.filter(
-    //             (inv) => new Date(inv.InvoiceDate) >= new Date(startDate)
-    //         );
-    //     }
-    //     if (endDate) {
-    //         result = result.filter(
-    //             (inv) => new Date(inv.InvoiceDate) <= new Date(endDate)
-    //         );
-    //     }
-
-    //     result = result.sort((a, b) => {
-    //         const fieldA =
-    //             sortField === "TotalAmount"
-    //                 ? parseFloat(a.TotalAmount)
-    //                 : new Date(a.InvoiceDate);
-    //         const fieldB =
-    //             sortField === "TotalAmount"
-    //                 ? parseFloat(b.TotalAmount)
-    //                 : new Date(b.InvoiceDate);
-    //         if (sortOrder === "asc") return fieldA > fieldB ? 1 : -1;
-    //         return fieldA < fieldB ? 1 : -1;
-    //     });
-
-    //     setFilteredInvoices(result);
-    //     setCurrentPage(1);
-    // }, [
-    //     searchTerm,
-    //     startDate,
-    //     endDate,
-    //     sortField,
-    //     sortOrder,
-    //     invoices,
-    //     filterTag,
-    //     selectedTag,
-    //     starredInvoices,
-    //     showStarredOnly,
-    // ]);
-
-    // ---------- Cập nhật đoạn mã mới 13:59 (23/07) || API thật ----------
     useEffect(() => {
         let result = invoices;
 
@@ -200,14 +116,6 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
         showStarredOnly,
     ]);
 
-    // ---------- Thêm đoạn mã mới 7:40 (23/07) || localStorage ----------
-    // useEffect(() => {
-    //     localStorage.setItem(
-    //         "starredInvoices",
-    //         JSON.stringify(starredInvoices)
-    //     );
-    // }, [starredInvoices]);
-
     const exportToExcel = () => {
         const ws = XLSX.utils.json_to_sheet(filteredInvoices);
         const wb = XLSX.utils.book_new();
@@ -229,16 +137,6 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
         setAvailableTags([...new Set(allTags)]);
     };
 
-    // ---------- Thêm đoạn mã mới 7:40 (23/07) || localStorage ----------
-    // const toggleStar = (invoiceId) => {
-    //     setStarredInvoices((prev) =>
-    //         prev.includes(invoiceId)
-    //             ? prev.filter((id) => id !== invoiceId)
-    //             : [...prev, invoiceId]
-    //     );
-    // };
-
-    // ---------- Thêm đoạn mã mới 14:02 (23/07) || API thật ----------
     const toggleStar = async (invoiceId, currentStarred) => {
         try {
             const response = await fetch(
