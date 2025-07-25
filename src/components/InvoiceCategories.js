@@ -9,7 +9,7 @@ function InvoiceCategories({ onSelectCategory }) {
         const fetchInvoices = async () => {
             try {
                 const res = await fetch(
-                    `${process.env.REACT_APP_API_GET_URL}`,
+                    `${process.env.REACT_APP_API_INVOICE_URL}`,
                     {
                         method: "GET",
                     }

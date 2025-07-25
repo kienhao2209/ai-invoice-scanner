@@ -24,7 +24,7 @@ function InvoiceLookup() {
         const keyword = searchValue.trim();
 
         try {
-            let url = process.env.REACT_APP_API_GET_URL;
+            let url = process.env.REACT_APP_API_INVOICE_URL;
             if (isInvoiceId(keyword)) {
                 url += `/${encodeURIComponent(keyword)}`;
             } else {

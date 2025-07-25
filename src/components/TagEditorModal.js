@@ -12,7 +12,7 @@ function TagEditorModal({ invoice, onClose, onSave }) {
 
         try {
             const res = await fetch(
-                `${process.env.REACT_APP_API_GET_URL}/${invoice.InvoiceId}`,
+                `${process.env.REACT_APP_API_UPDATE_TAGS_URL}/${invoice.InvoiceId}`,
                 {
                     method: "PATCH",
                     headers: {

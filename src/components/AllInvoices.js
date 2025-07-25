@@ -34,7 +34,7 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
         const fetchInvoices = async () => {
             try {
                 const res = await fetch(
-                    `${process.env.REACT_APP_API_GET_URL}`,
+                    `${process.env.REACT_APP_API_INVOICE_URL}`,
                     { method: "GET" }
                 );
                 if (!res.ok) throw new Error(`Lỗi server: ${res.status}`);
@@ -140,7 +140,7 @@ function AllInvoices({ filterTag, showStarredOnly = false }) {
     const toggleStar = async (invoiceId, currentStarred) => {
         try {
             const response = await fetch(
-                `${process.env.REACT_APP_API_BASE_URL}/invoice/starred/${invoiceId}`,
+                `${process.env.REACT_APP_API_UPDATE_STARRED_URL}/${invoiceId}`,
                 {
                     method: "PATCH",
                     headers: { "Content-Type": "application/json" },
