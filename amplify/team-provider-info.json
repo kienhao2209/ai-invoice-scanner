@@ -1,20 +1,15 @@
 {
-  "dev": {
+  "main": {
     "awscloudformation": {
-      "AuthRoleName": "amplify-invoicescannerui-dev-ea6e1-authRole",
-      "UnauthRoleArn": "arn:aws:iam::676206917094:role/amplify-invoicescannerui-dev-ea6e1-unauthRole",
-      "AuthRoleArn": "arn:aws:iam::676206917094:role/amplify-invoicescannerui-dev-ea6e1-authRole",
-      "Region": "ap-southeast-1",
-      "DeploymentBucketName": "amplify-invoicescannerui-dev-ea6e1-deployment",
-      "UnauthRoleName": "amplify-invoicescannerui-dev-ea6e1-unauthRole",
-      "StackName": "amplify-invoicescannerui-dev-ea6e1",
-      "StackId": "arn:aws:cloudformation:ap-southeast-1:676206917094:stack/amplify-invoicescannerui-dev-ea6e1/c6e052f0-5db1-11f0-8076-025a6db9e525",
-      "AmplifyAppId": "d125wq8aw8pmff"
-    },
-    "categories": {
-      "auth": {
-        "invoicescannerui371e1d29": {}
-      }
+      "AuthRoleName": "amplify-aiinvoicescanner-main-9ee41-authRole",
+      "UnauthRoleArn": "arn:aws:iam::676206917094:role/amplify-aiinvoicescanner-main-9ee41-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::676206917094:role/amplify-aiinvoicescanner-main-9ee41-authRole",
+      "Region": "us-east-1",
+      "DeploymentBucketName": "amplify-aiinvoicescanner-main-9ee41-deployment",
+      "UnauthRoleName": "amplify-aiinvoicescanner-main-9ee41-unauthRole",
+      "StackName": "amplify-aiinvoicescanner-main-9ee41",
+      "StackId": "arn:aws:cloudformation:us-east-1:676206917094:stack/amplify-aiinvoicescanner-main-9ee41/083cd800-690a-11f0-a1a5-12fdc41be527",
+      "AmplifyAppId": "d2j31rrc5fbapz"
     }
   }
 }
