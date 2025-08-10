@@ -70,4 +70,44 @@ Mọi đóng góp vui lòng tạo Pull Request hoặc Issue để trao đổi.
 
 ## Demo interface
 
-<img width="1919" height="1020" alt="image" src="https://github.com/user-attachments/assets/a9e5b729-1c0d-4e5c-8eca-1f3b8678798b" />
+### Danh sách hóa đơn
+
+![Invoice List](./docs/screenshots/invoice-list.png)
+
+### Trang chi tiết hóa đơn
+
+![Invoice Detail](./docs/screenshots/invoice-detail.png)
+
+### Upload hóa đơn mới
+
+![Upload Invoice](./docs/screenshots/upload-invoice.png)
+
+### Trang hóa đơn quan trọng
+
+![Invoice Important](./docs/screenshots/invoice-important.png)
+
+### Trang tra cứu hóa đơn theo ID hoặc tên khách hàng
+
+![Invoice Lookup](./docs/screenshots/invoice-lookup.png)
+
+### Trang danh mục hóa đơn (tags)
+
+![Invoice Tags](./docs/screenshots/invoice-tags.png)
+
+## Function
+
+AI Invoice Scanner hỗ trợ đầy đủ các chức năng quản lý hóa đơn thông minh:
+
+1. **Upload file (image/PDF)** – Tải lên hóa đơn dưới dạng ảnh hoặc PDF để hệ thống tự động xử lý.
+2. **Details invoices** – Xem chi tiết thông tin hóa đơn đã được AI trích xuất.
+3. **List invoices** – Hiển thị danh sách toàn bộ hóa đơn đã lưu.
+4. **Lookup invoice** – Tìm kiếm hóa đơn theo từ khóa hoặc ID.
+5. **Export file Excel** – Xuất dữ liệu hóa đơn ra file Excel để lưu trữ hoặc phân tích.
+6. **Lọc theo khoảng thời gian** – Lọc hóa đơn theo ngày phát hành hoặc khoảng thời gian mong muốn.
+7. **Sắp xếp theo số tiền** – Sắp xếp danh sách hóa đơn tăng/giảm theo giá trị.
+8. **Sắp xếp theo ngày hóa đơn** – Sắp xếp hóa đơn theo ngày phát hành.
+9. **Kéo-thả khi upload file** – Hỗ trợ drag-and-drop để tải lên hóa đơn nhanh chóng.
+10. **Category invoice** – Phân loại hóa đơn theo danh mục.
+11. **Update tags** – Thêm hoặc chỉnh sửa thẻ (tags) cho hóa đơn.
+12. **Filter tags** – Lọc hóa đơn theo thẻ (tags).
+13. **Starred invoices** – Đánh dấu các hóa đơn quan trọng để theo dõi nhanh.
